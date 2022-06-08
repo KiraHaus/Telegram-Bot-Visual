@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Telegram.Bot;
+using Newtonsoft.Json;
 
 namespace Telegram_Bot_Visual
 {
@@ -23,6 +25,16 @@ namespace Telegram_Bot_Visual
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void SendMessage(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void LoadFile(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
