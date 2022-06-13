@@ -14,6 +14,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Telegram.Bot;
 using Newtonsoft.Json;
+using Telegram.Bot.Extensions.Polling;
+using Telegram.Bot.Types.ReplyMarkups;
+using Telegram.Bot.Types;
 
 namespace Telegram_Bot_Visual
 {
@@ -22,14 +25,17 @@ namespace Telegram_Bot_Visual
     /// </summary>
     public partial class MainWindow : Window
     {
+        BotClient client;
         public MainWindow()
         {
             InitializeComponent();
+            client = new BotClient(this);
+            listMessage.ItemsSource = client.BotMessage;
         }
 
         private void SendMessage(object sender, RoutedEventArgs e)
         {
-
+            client.SendMessage(admMessage.Text, TargetSend.Text);
         }
 
         private void LoadFile(object sender, RoutedEventArgs e)
