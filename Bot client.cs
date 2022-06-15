@@ -1,10 +1,12 @@
 ﻿using System;
 using Telegram.Bot;
+using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.Bot.Types;
 using Telegram.Bot.Exceptions;
+using System.Threading.Tasks;
 using System.Threading;
 
 namespace Telegram_Bot_Visual
@@ -15,6 +17,16 @@ namespace Telegram_Bot_Visual
         //"5547982888:AAFN0hoWwHf07vmtqV72Sho8d5rgd3uR8XY"
         private TelegramBotClient bot;
         public ObservableCollection<Message> BotMessage { get; set; }
+
+        static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+        {
+            Console.WriteLine(JsonConvert.SerializeObject(exception));
+        }
+
+        async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+        {
+            MessageListener(botClient,update);
+        }
 
         private void MessageListener(object sender, Update e)
         {
@@ -40,7 +52,14 @@ namespace Telegram_Bot_Visual
 
             bot = new TelegramBotClient(PathToken);
 
-            ///Вот здесь пока не могу понять как сделать конструктор дальше
+            var cansellationToken = new CancellationTokenSource();
+
+            var receiverOptions = new ReceiverOptions
+            {
+                AllowedUpdates = { },
+            };
+
+            bot.StartReceiving(updateHandler: HandleUpdateAsync, errorHandler: HandleErrorAsync, receiverOptions: receiverOptions, cansellationToken.Token);
 
         }
 

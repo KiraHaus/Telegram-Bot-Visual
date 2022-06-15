@@ -29,7 +29,7 @@ namespace Telegram_Bot_Visual
         public MainWindow()
         {
             InitializeComponent();
-            client = new BotClient(this);
+            client = new BotClient();
             listMessage.ItemsSource = client.BotMessage;
         }
 
