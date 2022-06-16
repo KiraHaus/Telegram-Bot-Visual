@@ -6,8 +6,10 @@ using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.Bot.Types;
 using Telegram.Bot.Exceptions;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Threading;
+using Telegram.Bot.Types.Enums;
 
 namespace Telegram_Bot_Visual
 {
@@ -25,7 +27,22 @@ namespace Telegram_Bot_Visual
 
         async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            MessageListener(botClient,update);
+            if (update.Type != UpdateType.Message)
+            {
+                return;
+            }
+
+            if (update.Message.Type != MessageType.Text)
+            {
+                return;
+            }
+
+            Debug.WriteLine($"{DateTime.Now.ToLongTimeString()} : {Convert.ToString(update.Message.From.Id)} {update.Message.Text} {update.Message.From.FirstName}");
+
+            w.Dispatcher.Invoke(() =>
+            {
+                BotMessage.Add(new Message(DateTime.Now.ToLongTimeString(), update.Message.Text,update.Message.From.FirstName, update.Message.From.Id));
+            });
         }
 
         private void MessageListener(object sender, Update e)
@@ -45,22 +62,32 @@ namespace Telegram_Bot_Visual
             });
         }
 
-        public void ITelegramBotClient (MainWindow W, string PathToken = "5547982888:AAFN0hoWwHf07vmtqV72Sho8d5rgd3uR8XY")
+        public void TelegramBotClient (MainWindow window, string PathToken = "5547982888:AAFN0hoWwHf07vmtqV72Sho8d5rgd3uR8XY")
         {
-            this.BotMessage = new ObservableCollection<Message>();
-            this.w = W;
+            //this.BotMessage = new ObservableCollection<Message>();
+            //this.w = W;
 
+            //bot = new TelegramBotClient(PathToken);
+
+            //var cansellationToken = new CancellationTokenSource();
+
+            //var receiverOptions = new ReceiverOptions
+            //{
+            //    AllowedUpdates = { },
+            //};
+
+            //bot.StartReceiving(updateHandler: HandleUpdateAsync, errorHandler: HandleErrorAsync, receiverOptions: receiverOptions, cansellationToken.Token);
+            BotMessage = new ObservableCollection<Message>();
+            w = window;
             bot = new TelegramBotClient(PathToken);
-
             var cansellationToken = new CancellationTokenSource();
 
             var receiverOptions = new ReceiverOptions
             {
-                AllowedUpdates = { },
+                AllowedUpdates = Array.Empty<UpdateType>()
             };
 
             bot.StartReceiving(updateHandler: HandleUpdateAsync, errorHandler: HandleErrorAsync, receiverOptions: receiverOptions, cansellationToken.Token);
-
         }
 
         public void SendMessage(string Text, string Id)
