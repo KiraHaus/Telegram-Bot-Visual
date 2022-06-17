@@ -12,11 +12,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Telegram.Bot;
+using System.Media;
+using System.IO;
+using Microsoft.Win32;
 using Newtonsoft.Json;
-using Telegram.Bot.Extensions.Polling;
-using Telegram.Bot.Types.ReplyMarkups;
-using Telegram.Bot.Types;
 
 namespace Telegram_Bot_Visual
 {
@@ -29,18 +28,44 @@ namespace Telegram_Bot_Visual
         public MainWindow()
         {
             InitializeComponent();
-            client = new BotClient();
+            client = new BotClient(this, "5547982888:AAFN0hoWwHf07vmtqV72Sho8d5rgd3uR8XY");
             listMessage.ItemsSource = client.BotMessage;
         }
 
         private void SendMessage(object sender, RoutedEventArgs e)
         {
             client.SendMessage(admMessage.Text, TargetSend.Text);
+            TargetSend.Text = "";
         }
 
-        private void LoadFile(object sender, RoutedEventArgs e)
+        private void SaveDialog(object sender, RoutedEventArgs e)
         {
+            var json = JsonConvert.SerializeObject(client.BotMessage);
 
+            SaveFileDialog dialog = new SaveFileDialog();
+
+            if (dialog.ShowDialog() == true)
+            {
+                File.WriteAllText($@"{dialog.FileName}", json);
+            }
+        }
+
+        private void LoadDialog(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+
+            if (dialog.ShowDialog() == true)
+            {
+                string message = File.ReadAllText(dialog.FileName);
+                client.BotMessage.Clear();
+
+                var json = JsonConvert.DeserializeObject<List<Message>>(message);
+
+                foreach (dynamic item in json)
+                {
+                    client.BotMessage.Add(new Message(item.Time, item.Msg, item.FirstName, item.Id));
+                }
+            }
         }
     }
 }
